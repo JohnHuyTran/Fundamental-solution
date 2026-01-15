@@ -1,13 +1,19 @@
 
 export enum UserStatus {
-  ACTIVE = 'Active',
-  LOCKED = 'Locked',
-  PENDING = 'Pending'
+  ACTIVE = 'Hoạt động',
+  LOCKED = 'Đã khóa',
+  PENDING = 'Chờ duyệt'
 }
 
 export enum UserRole {
-  ADMIN = 'Administrator',
-  USER = 'Standard User'
+  ADMIN = 'Quản trị viên',
+  USER = 'Người dùng'
+}
+
+export enum SessionStatus {
+  ACTIVE = 'Đang hoạt động',
+  TERMINATED = 'Bị ngắt',
+  EXPIRED = 'Hết hạn'
 }
 
 export enum RiskLevel {
@@ -18,31 +24,115 @@ export enum RiskLevel {
   CRITICAL = 'Critical'
 }
 
-export interface User {
+// --- Navigation Types ---
+export interface MenuItem {
   id: string;
-  username: string;
-  fullName: string;
-  email: string;
-  phone: string;
-  role: UserRole;
-  department: string;
-  status: UserStatus;
-  createdAt: string;
-  lastLogin: string;
+  label: string;
+  path: string;
+  icon: string;
+  isVisible: boolean;
+  parentId: string | null;
+  children?: MenuItem[];
 }
 
-// Updated UserGroup to include id/name aliases as used by components
+export enum OverrideState {
+  INHERIT = 'Inherit',
+  GRANT = 'Grant',
+  DENY = 'Deny'
+}
+
+export interface UserMenuOverride {
+  menuId: string;
+  state: OverrideState;
+}
+
+// --- User Management & Groups ---
 export interface UserGroup {
   id: string;
-  key: string;
   name: string;
-  title: string;
+  parentId: string | null;
   description: string;
   memberCount: number;
+  managerId: string | null; // Cập nhật: ID của người quản lý nhóm
+  memberIds: string[];      // Cập nhật: Danh sách ID nhân viên thuộc nhóm
   children?: UserGroup[];
 }
 
-export interface AuditLog {
+// --- Storage & Cloud Types ---
+export interface DigitalSignature {
+  id: string;
+  signedBy: string;
+  signedAt: string;
+  certificateId: string;
+  hash: string;
+  isValid: boolean;
+}
+
+export interface FileVersion {
+  id: string;
+  version: number;
+  size: number;
+  updatedAt: string;
+  updatedBy: string;
+  comment: string;
+}
+
+export interface StorageStats {
+  total: number;
+  used: number;
+  free: number;
+  awsLimit: number;
+  awsUsed: number;
+  byProvider: { name: string; value: number; color: string }[];
+  byType: { type: string; size: number; icon: string; color: string }[];
+}
+
+export interface StorageQuota {
+  id: string;
+  targetName: string;
+  type: 'User' | 'Department';
+  limit: number;
+  used: number;
+  userId?: string;
+}
+
+export interface FileItem {
+  id: string;
+  name: string;
+  type: 'image' | 'document' | 'archive' | 'folder';
+  size: number;
+  updatedAt: string;
+  parentId: string | null;
+  owner: string;
+  url?: string;
+  sharedWith?: string[];
+  isLocked?: boolean;
+  versions?: FileVersion[];
+  signature?: DigitalSignature;
+}
+
+export type StorageProviderType = 'Local' | 'AWS S3' | 'Google Cloud' | 'FTP' | 'Azure';
+
+export interface StorageProviderConfig {
+  id: string;
+  type: StorageProviderType;
+  name: string;
+  status: 'Online' | 'Offline' | 'Testing';
+  isDefault: boolean;
+  credentials: Record<string, string>;
+}
+
+export interface StorageConfig {
+  name: string;
+  provider: StorageProviderType;
+  status: 'Connected' | 'Disconnected';
+  usage: number;
+  allowedExtensions?: string[];
+  maxFileSizeMB?: number;
+}
+
+// --- Security & Audit Log Types ---
+export interface AuditLogEntry {
   id: string;
   timestamp: string;
   risk: RiskLevel;
@@ -53,120 +143,23 @@ export interface AuditLog {
   ip: string;
   device: string;
   browser: string;
-  payload: string;
+  bodyPreview: string;
+  sessionId: string;
 }
 
-// Updated UserSession to match usage in components
-export enum SessionStatus {
-  ACTIVE = 'Active',
-  TERMINATED = 'Terminated',
-  EXPIRED = 'Expired'
-}
-
-export interface UserSession {
-  id: string;
-  username: string;
-  userName?: string; // Component alias
-  ip: string;
-  ipAddress?: string; // Component alias
-  device: string;
-  browser?: string;
-  loginTime: string;
-  logoutTime?: string;
-  lastActive: string;
-  duration?: string;
-  status: SessionStatus;
-}
-
-// Added missing UserFilters type
-export interface UserFilters {
-  search: string;
-  role: string;
-  department: string;
-  status: string;
-}
-
-// Added missing RoleDefinition type
 export interface RoleDefinition {
   id: string;
   name: string;
   code: string;
   description: string;
-  isSystem?: boolean;
+  isSystem: boolean;
 }
 
-// Added missing Storage/File management types
-export type StorageProviderType = 'Local' | 'AWS S3' | 'Google Cloud' | 'Azure' | 'FTP';
-
-export interface StorageConfig {
-  name: string;
-  provider: string;
-  usage: number;
-  status: 'Connected' | 'Disconnected' | 'Warning';
-  allowedExtensions?: string[];
-  maxFileSizeMB?: number;
-}
-
-export interface StorageProviderConfig {
-  id: string;
-  name: string;
-  type: StorageProviderType;
-  status: string;
-  isDefault?: boolean;
-}
-
-export interface StorageQuota {
-  id: string;
-  type: 'User' | 'Group';
-  targetName: string;
-  used: number;
-  limit: number;
-}
-
-export interface FileVersion {
-  id: string;
-  version: number;
-  comment: string;
-  updatedBy: string;
-  updatedAt: string;
-  size: number;
-}
-
-export interface DigitalSignature {
-  id: string;
-  signedBy: string;
-  signedAt: string;
-  certificateId: string;
-  hash: string;
-  isValid: boolean;
-}
-
-export interface FileItem {
-  id: string;
-  name: string;
-  type: 'folder' | 'image' | 'document' | 'archive';
-  size: number;
-  owner: string;
-  updatedAt: string;
-  parentId: string | null;
-  signature?: DigitalSignature;
-  versions?: FileVersion[];
-}
-
-export interface StorageStats {
-  used: number;
-  free: number;
-  awsUsed: number;
-  awsLimit: number;
-  byType: { type: string; size: number }[];
-}
-
-// Added missing Log management types
 export enum LogLevel {
-  ERROR = 'ERROR',
-  WARN = 'WARN',
+  DEBUG = 'DEBUG',
   INFO = 'INFO',
-  DEBUG = 'DEBUG'
+  WARN = 'WARN',
+  ERROR = 'ERROR'
 }
 
 export interface LogEntry {
@@ -189,9 +182,9 @@ export interface LogSettings {
   format: 'Plain Text' | 'JSON';
   pattern: string;
   toggles: {
-    Performance: boolean;
     Security: boolean;
-    Database: boolean;
+    Performance: boolean;
+    Audit: boolean;
   };
   packages: LogPackageConfig[];
   appender: 'Local' | 'Centralized' | 'Cloud';
@@ -200,7 +193,7 @@ export interface LogSettings {
 export enum MaskingRuleType {
   MASK_ALL = 'Mask All',
   PARTIAL = 'Partial Mask',
-  SHOW_LAST_4 = 'Show Last 4'
+  HASH = 'Hash'
 }
 
 export interface MaskingRule {
@@ -220,34 +213,35 @@ export interface LogPolicyConfig {
   };
 }
 
-// Added missing Navigation types
-export interface MenuItem {
+export interface User {
   id: string;
-  label: string;
-  path: string;
-  icon: string;
-  isVisible: boolean;
-  parentId: string | null;
-  children?: MenuItem[];
-}
-
-export enum OverrideState {
-  GRANT = 'GRANT',
-  DENY = 'DENY',
-  INHERIT = 'INHERIT'
-}
-
-// Added missing AuditLogEntry type
-export interface AuditLogEntry {
-  id: string;
-  risk: RiskLevel;
-  timestamp: string;
-  method: string;
-  uri: string;
-  bodyPreview: string;
   username: string;
-  ip: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  role: UserRole;
+  department: string;
+  status: UserStatus;
+  createdAt: string;
+  lastLogin: string;
+}
+
+export interface UserFilters {
+  search: string;
+  role: string;
+  status: string;
+  department: string;
+}
+
+export interface UserSession {
+  id: string;
+  userName: string;
+  ipAddress: string;
   device: string;
   browser: string;
-  status: number;
+  loginTime: string;
+  lastActive: string;
+  status: SessionStatus;
+  duration?: string;
+  logoutTime?: string;
 }

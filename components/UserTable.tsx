@@ -37,7 +37,8 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onLockToggle, onRe
           <thead>
             {/* Header màu xanh chuẩn theo ảnh */}
             <tr className="bg-blue-600 text-white sticky top-0 z-20">
-              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[250px]">Employee Identity</th>
+              {/* Cập nhật cột Employee (Yêu cầu 2) */}
+              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[250px]">Employee</th>
               <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[200px]">Contact Sync</th>
               <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[150px]">Org Unit</th>
               <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[150px]">State</th>

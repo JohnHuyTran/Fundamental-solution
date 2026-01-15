@@ -14,7 +14,7 @@ const SessionMonitor: React.FC<Props> = ({ activeSessions, history, onForceLogou
   const [tab, setTab] = useState<'live' | 'history'>('live');
 
   const getDeviceIcon = (device: string) => {
-    if (device.toLowerCase().includes('mac') || device.toLowerCase().includes('windows') || device.toLowerCase().includes('workstation')) return <Monitor size={18} />;
+    if (device.toLowerCase().includes('mac') || device.toLowerCase().includes('windows')) return <Monitor size={18} />;
     if (device.toLowerCase().includes('iphone') || device.toLowerCase().includes('android')) return <Smartphone size={18} />;
     return <Globe size={18} />;
   };
@@ -63,9 +63,9 @@ const SessionMonitor: React.FC<Props> = ({ activeSessions, history, onForceLogou
                 <tr key={session.id} className="hover:bg-blue-50/50 transition-colors group">
                   <td className="px-10 py-5">
                     <div className="flex items-center gap-4">
-                       <div className="h-10 w-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-black text-sm">{(session.username || 'U').charAt(0)}</div>
+                       <div className="h-10 w-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-black text-sm">{session.userName.charAt(0)}</div>
                        <div>
-                          <p className="font-black text-slate-800 text-sm group-hover:text-blue-700 transition-colors">{session.username}</p>
+                          <p className="font-black text-slate-800 text-sm group-hover:text-blue-700 transition-colors">{session.userName}</p>
                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest italic">ID: {session.id}</p>
                        </div>
                     </div>
@@ -77,7 +77,7 @@ const SessionMonitor: React.FC<Props> = ({ activeSessions, history, onForceLogou
                        </div>
                        <div>
                           <p className="text-xs font-bold text-slate-600">{session.device}</p>
-                          <p className="text-[10px] font-mono font-bold text-blue-400 tracking-tighter">{session.ip}</p>
+                          <p className="text-[10px] font-mono font-bold text-blue-400 tracking-tighter">{session.ipAddress}</p>
                        </div>
                     </div>
                   </td>
@@ -87,8 +87,8 @@ const SessionMonitor: React.FC<Props> = ({ activeSessions, history, onForceLogou
                   <td className="px-10 py-5">
                      {tab === 'history' ? (
                        <div className="space-y-1">
-                          <p className="text-xs font-bold text-slate-500">{session.logoutTime || '-'}</p>
-                          <p className="text-[9px] font-black text-indigo-400 uppercase">{session.duration || '-'}</p>
+                          <p className="text-xs font-bold text-slate-500">{session.logoutTime}</p>
+                          <p className="text-[9px] font-black text-indigo-400 uppercase">{session.duration}</p>
                        </div>
                      ) : (
                        <div className="flex items-center gap-2">
