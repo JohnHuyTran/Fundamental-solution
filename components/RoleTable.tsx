@@ -15,12 +15,11 @@ const RoleTable: React.FC<RoleTableProps> = ({ roles, onEdit, onDelete }) => {
       <div className="max-h-[580px] overflow-y-auto">
         <table className="w-full text-left border-collapse table-auto">
           <thead>
-            {/* Header Blue (Yêu cầu 3) */}
             <tr className="bg-blue-600 text-white sticky top-0 z-20">
-              <th className="px-8 py-6 text-[12px] font-bold uppercase tracking-wider min-w-[200px]">Tên vai trò</th>
-              <th className="px-8 py-6 text-[12px] font-bold uppercase tracking-wider min-w-[150px]">Mã định danh</th>
-              <th className="px-8 py-6 text-[12px] font-bold uppercase tracking-wider min-w-[300px]">Mô tả chi tiết</th>
-              <th className="px-8 py-6 text-[12px] font-bold uppercase tracking-wider text-right min-w-[150px]">Thao tác</th>
+              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[200px]">Tên vai trò</th>
+              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[150px]">Mã định danh</th>
+              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[300px]">Mô tả chi tiết</th>
+              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider text-right min-w-[150px]">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-blue-50">
@@ -70,7 +69,7 @@ const RoleTable: React.FC<RoleTableProps> = ({ roles, onEdit, onDelete }) => {
                       {!role.isSystem && (
                         <button
                           onClick={() => onDelete(role.id)}
-                          className="p-2.5 text-rose-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all shadow-sm border border-transparent hover:border-rose-100"
+                          className="p-2.5 text-rose-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all shadow-sm border border-transparent hover:border-blue-100"
                           title="Xóa"
                         >
                           <Trash2 size={18} />

@@ -20,8 +20,8 @@ const SessionTable: React.FC<SessionTableProps> = ({ sessions, onForceLogout, ti
   };
 
   const getDeviceIcon = (device: string) => {
-    if (device.toLowerCase().includes('desktop')) return <Monitor size={16} />;
-    if (device.toLowerCase().includes('mobile')) return <Smartphone size={16} />;
+    if (device.toLowerCase().includes('desktop') || device.toLowerCase().includes('workstation')) return <Monitor size={16} />;
+    if (device.toLowerCase().includes('mobile') || device.toLowerCase().includes('iphone')) return <Smartphone size={16} />;
     return <Globe size={16} />;
   };
 
@@ -65,7 +65,8 @@ const SessionTable: React.FC<SessionTableProps> = ({ sessions, onForceLogout, ti
                           <UserIcon size={18} />
                         </div>
                         <div>
-                          <div className="font-bold text-blue-900 group-hover:text-blue-700 transition-colors">{session.userName}</div>
+                          {/* Use username since userName might be missing from some sources */}
+                          <div className="font-bold text-blue-900 group-hover:text-blue-700 transition-colors">{session.username}</div>
                           <div className="text-[10px] text-blue-400 font-black uppercase tracking-widest">ID: {session.id}</div>
                         </div>
                       </div>
@@ -73,10 +74,10 @@ const SessionTable: React.FC<SessionTableProps> = ({ sessions, onForceLogout, ti
                     <td className="px-8 py-5">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 text-[13px] font-bold text-slate-600">
-                          <Globe size={12} className="text-blue-500" /> {session.ipAddress}
+                          <Globe size={12} className="text-blue-500" /> {session.ip}
                         </div>
                         <div className="flex items-center gap-2 text-[11px] font-medium text-blue-300">
-                          {getDeviceIcon(session.device)} {session.device} • {session.browser}
+                          {getDeviceIcon(session.device)} {session.device} {session.browser ? `• ${session.browser}` : ''}
                         </div>
                       </div>
                     </td>

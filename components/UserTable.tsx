@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { User, UserStatus } from '../types';
-import { Edit2, Lock, Unlock, Key, MoreHorizontal, ShieldCheck, Mail, Phone, ExternalLink, Sparkles } from 'lucide-react';
+import { Edit2, Lock, Unlock, Key, MoreHorizontal, ShieldCheck, Mail, Phone, ExternalLink, Sparkles, UserX, UserCheck } from 'lucide-react';
 import { analyzeUserSecurity } from '../services/geminiService';
 
 interface UserTableProps {
@@ -9,9 +9,10 @@ interface UserTableProps {
   onEdit: (user: User) => void;
   onLockToggle: (user: User) => void;
   onResetPassword: (user: User) => void;
+  isAdmin?: boolean;
 }
 
-const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onLockToggle, onResetPassword }) => {
+const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onLockToggle, onResetPassword, isAdmin = true }) => {
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
   const [securityAdvice, setSecurityAdvice] = useState<Record<string, string>>({});
 
@@ -34,20 +35,20 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onLockToggle, onRe
       <div className="max-h-[650px] overflow-y-auto">
         <table className="w-full text-left border-collapse table-auto">
           <thead>
-            {/* Header Blue (Yêu cầu 3) */}
+            {/* Header màu xanh chuẩn theo ảnh */}
             <tr className="bg-blue-600 text-white sticky top-0 z-20">
-              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] min-w-[250px]">Hồ sơ nhân viên</th>
-              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] min-w-[200px]">Liên lạc</th>
-              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] min-w-[150px]">Phòng ban</th>
-              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] min-w-[150px]">Trạng thái</th>
-              <th className="px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-right min-w-[180px]">Thao tác</th>
+              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[250px]">Employee Identity</th>
+              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[200px]">Contact Sync</th>
+              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[150px]">Org Unit</th>
+              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider min-w-[150px]">State</th>
+              <th className="px-8 py-6 text-[11px] font-bold uppercase tracking-wider text-right min-w-[180px]">Control Hub</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50">
             {users.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-8 py-20 text-center text-slate-400 font-bold text-xl bg-white">
-                  Không tìm thấy dữ liệu người dùng.
+                  No personnel data matches current criteria.
                 </td>
               </tr>
             ) : (
@@ -78,56 +79,60 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onLockToggle, onRe
                     </div>
                   </td>
                   <td className="px-8 py-5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[12px] font-black text-indigo-900 uppercase tracking-tighter bg-indigo-50 px-3 py-1 rounded-lg">
-                        {user.department}
-                      </span>
-                    </div>
+                    <span className="text-[12px] font-black text-indigo-900 uppercase tracking-tighter bg-indigo-50 px-3 py-1 rounded-lg">
+                      {user.department}
+                    </span>
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex flex-col gap-2">
                       <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-black border uppercase tracking-tight shadow-sm self-start ${getStatusStyle(user.status)}`}>
                         {user.status}
                       </span>
-                      {securityAdvice[user.id] ? (
-                        <div className="text-[10px] bg-white p-3 rounded-xl border-2 border-blue-100 max-w-[200px] leading-relaxed italic text-blue-600 shadow-xl animate-in zoom-in-95 duration-300">
-                          <Sparkles size={10} className="inline mr-1 text-amber-500" /> {securityAdvice[user.id]}
-                        </div>
-                      ) : (
-                        <button 
-                          onClick={() => handleAudit(user)}
-                          disabled={analyzingId === user.id}
-                          className="text-[9px] text-blue-600 font-black uppercase tracking-[0.1em] hover:underline flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity"
-                        >
-                          {analyzingId === user.id ? 'Đang phân tích...' : <><ExternalLink size={10} /> Audit AI</>}
-                        </button>
+                      {isAdmin && (
+                        securityAdvice[user.id] ? (
+                          <div className="text-[10px] bg-white p-3 rounded-xl border-2 border-blue-100 max-w-[200px] leading-relaxed italic text-blue-600 shadow-xl animate-in zoom-in-95 duration-300">
+                            <Sparkles size={10} className="inline mr-1 text-amber-500" /> {securityAdvice[user.id]}
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={() => handleAudit(user)}
+                            disabled={analyzingId === user.id}
+                            className="text-[9px] text-blue-600 font-black uppercase tracking-[0.1em] hover:underline flex items-center gap-1 opacity-60 hover:opacity-100 transition-opacity"
+                          >
+                            {analyzingId === user.id ? 'Audit Active...' : <><ExternalLink size={10} /> Security Probe</>}
+                          </button>
+                        )
                       )}
                     </div>
                   </td>
                   <td className="px-8 py-5 text-right">
-                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                      <button
-                        onClick={() => onEdit(user)}
-                        className="p-3 text-blue-500 hover:text-white hover:bg-blue-600 rounded-xl transition-all shadow-sm border border-transparent hover:border-blue-700"
-                        title="Chỉnh sửa hồ sơ"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button
-                        onClick={() => onResetPassword(user)}
-                        className="p-3 text-amber-500 hover:text-white hover:bg-amber-600 rounded-xl transition-all shadow-sm border border-transparent hover:border-amber-700"
-                        title="Đặt lại mật khẩu"
-                      >
-                        <Key size={16} />
-                      </button>
-                      <button
-                        onClick={() => onLockToggle(user)}
-                        className={`p-3 rounded-xl transition-all shadow-sm border border-transparent ${user.status === UserStatus.LOCKED ? 'text-emerald-500 hover:text-white hover:bg-emerald-600 hover:border-emerald-700' : 'text-rose-500 hover:text-white hover:bg-rose-600 hover:border-rose-700'}`}
-                        title={user.status === UserStatus.LOCKED ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}
-                      >
-                        {user.status === UserStatus.LOCKED ? <Unlock size={16} /> : <Lock size={16} />}
-                      </button>
-                    </div>
+                    {isAdmin ? (
+                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                        <button
+                          onClick={() => onEdit(user)}
+                          className="p-3 text-blue-500 hover:text-white hover:bg-blue-600 rounded-xl transition-all shadow-sm border border-transparent hover:border-blue-700"
+                          title="Modify Profile"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          onClick={() => onResetPassword(user)}
+                          className="p-3 text-amber-500 hover:text-white hover:bg-amber-600 rounded-xl transition-all shadow-sm border border-transparent hover:border-amber-700"
+                          title="Force Credentials Reset"
+                        >
+                          <Key size={16} />
+                        </button>
+                        <button
+                          onClick={() => onLockToggle(user)}
+                          className={`p-3 rounded-xl transition-all shadow-sm border border-transparent ${user.status === UserStatus.LOCKED ? 'text-emerald-500 hover:text-white hover:bg-emerald-600 hover:border-emerald-700' : 'text-rose-500 hover:text-white hover:bg-rose-600 hover:border-rose-700'}`}
+                          title={user.status === UserStatus.LOCKED ? 'Reactivate Personnel' : 'Lock Personnel'}
+                        >
+                          {user.status === UserStatus.LOCKED ? <Unlock size={16} /> : <Lock size={16} />}
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Locked for Users</span>
+                    )}
                     <div className="group-hover:hidden text-slate-200">
                       <MoreHorizontal size={18} />
                     </div>
